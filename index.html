@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>白鸟绫音 · 角色卡</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+      :root {
+        --paper: #fffaf5;
+        --ink: #2f2934;
+        --muted: #72636d;
+        --rose: #c95570;
+        --rose-soft: #fde8ee;
+        --gold: #bd9041;
+        --blue: #4e6f91;
+        --mint: #517f72;
+        --line: #e5d2c9;
+        --white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(189, 144, 65, 0.18), transparent 170px),
+          var(--paper);
+        font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      #app {
+        min-height: 100vh;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 36px));
+        margin: 0 auto;
+        padding: 34px 0 54px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 26px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .name {
+        margin: 0;
+        font-size: clamp(34px, 6vw, 64px);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.7;
+      }
+
+      .mode-switch {
+        display: inline-flex;
+        gap: 6px;
+        padding: 6px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.78);
+        flex: 0 0 auto;
+      }
+
+      .mode-switch button {
+        min-width: 74px;
+        border: 0;
+        border-radius: 6px;
+        padding: 9px 12px;
+        color: var(--muted);
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .mode-switch button.active {
+        color: var(--white);
+        background: var(--rose);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+        gap: 24px;
+        align-items: stretch;
+        margin-bottom: 24px;
+      }
+
+      .portrait {
+        position: relative;
+        min-height: 430px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          radial-gradient(circle at 28% 20%, rgba(253, 232, 238, 0.95), transparent 28%),
+          linear-gradient(135deg, #fffdf9, #f4e2da 48%, #dfeaf0);
+      }
+
+      .portrait::before {
+        content: "";
+        position: absolute;
+        inset: 56px 74px 28px;
+        border: 2px solid rgba(189, 144, 65, 0.52);
+        border-radius: 50% 50% 44% 44%;
+      }
+
+      .portrait-figure {
+        position: absolute;
+        left: 50%;
+        bottom: 22px;
+        width: min(58%, 330px);
+        aspect-ratio: 0.64;
+        transform: translateX(-50%);
+      }
+
+      .hair {
+        position: absolute;
+        inset: 0 10% 13%;
+        border-radius: 46% 46% 38% 38%;
+        background: linear-gradient(150deg, #d7c0af, #8b6d69 58%, #4a3d48);
+        box-shadow: 0 30px 50px rgba(47, 41, 52, 0.18);
+      }
+
+      .face {
+        position: absolute;
+        left: 24%;
+        right: 24%;
+        top: 18%;
+        height: 34%;
+        border-radius: 48% 48% 44% 44%;
+        background: #ffe4d8;
+        border: 1px solid rgba(145, 96, 88, 0.18);
+      }
+
+      .bangs {
+        position: absolute;
+        left: 19%;
+        top: 13%;
+        width: 62%;
+        height: 19%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #cdb4a8, #6b5358);
+      }
+
+      .eye {
+        position: absolute;
+        top: 35%;
+        width: 10%;
+        height: 5%;
+        border-radius: 50%;
+        background: #463344;
+      }
+
+      .eye.left {
+        left: 35%;
+      }
+
+      .eye.right {
+        right: 35%;
+      }
+
+      .blush {
+        position: absolute;
+        top: 43%;
+        width: 13%;
+        height: 4%;
+        border-radius: 50%;
+        background: rgba(201, 85, 112, 0.34);
+      }
+
+      .blush.left {
+        left: 28%;
+      }
+
+      .blush.right {
+        right: 28%;
+      }
+
+      .dress {
+        position: absolute;
+        left: 18%;
+        right: 18%;
+        bottom: 0;
+        height: 45%;
+        border-radius: 36% 36% 12px 12px;
+        background: linear-gradient(160deg, #2f2934, #6f445b);
+      }
+
+      .ribbon {
+        position: absolute;
+        left: 38%;
+        top: 57%;
+        width: 24%;
+        height: 10%;
+        border-radius: 50%;
+        background: var(--rose);
+      }
+
+      .portrait-label {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        bottom: 24px;
+        padding: 16px 18px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(229, 210, 201, 0.86);
+      }
+
+      .portrait-label strong {
+        display: block;
+        color: var(--rose);
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+
+      .quote-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 430px;
+        padding: 30px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+      }
+
+      .quote {
+        margin: 0;
+        font-size: clamp(24px, 3vw, 38px);
+        line-height: 1.45;
+        color: var(--ink);
+      }
+
+      .meter-list {
+        display: grid;
+        gap: 16px;
+        margin-top: 28px;
+      }
+
+      .meter-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .meter-track {
+        height: 10px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #f1e4dd;
+      }
+
+      .meter-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--rose), var(--gold));
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 16px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .tab {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.74);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .tab.active {
+        border-color: var(--rose);
+        color: var(--rose);
+        background: var(--rose-soft);
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        min-height: 192px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .card h2 {
+        margin: 0 0 12px;
+        color: var(--rose);
+        font-size: 22px;
+        letter-spacing: 0;
+      }
+
+      .card p,
+      .card li {
+        color: var(--ink);
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .card p {
+        margin: 0;
+      }
+
+      .card ul {
+        margin: 0;
+        padding-left: 1.15em;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      .line-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .line {
+        padding: 12px 14px;
+        border-left: 4px solid var(--gold);
+        border-radius: 6px;
+        background: #fff7f1;
+        line-height: 1.7;
+      }
+
+      .relation {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .relation input {
+        width: 100%;
+        accent-color: var(--rose);
+      }
+
+      .reaction {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        color: var(--blue);
+        background: #edf5f7;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 820px) {
+        .topbar,
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .mode-switch {
+          width: 100%;
+        }
+
+        .mode-switch button {
+          flex: 1;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .portrait,
+        .quote-box {
+          min-height: 380px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <main class="shell">
+        <header class="topbar">
+          <div class="brand">
+            <h1 class="name">{{ character.name }}</h1>
+            <p class="subtitle">{{ character.tagline }}</p>
+          </div>
+          <div class="mode-switch" aria-label="互动模式">
+            <button
+              v-for="mode in modes"
+              :key="mode.key"
+              :class="{ active: activeMode === mode.key }"
+              type="button"
+              @click="activeMode = mode.key"
+            >
+              {{ mode.label }}
+            </button>
+          </div>
+        </header>
+
+        <section class="hero">
+          <div class="portrait" aria-label="白鸟绫音的风格化立绘">
+            <div class="portrait-figure">
+              <div class="hair"></div>
+              <div class="face"></div>
+              <div class="bangs"></div>
+              <div class="eye left"></div>
+              <div class="eye right"></div>
+              <div class="blush left"></div>
+              <div class="blush right"></div>
+              <div class="dress"></div>
+              <div class="ribbon"></div>
+            </div>
+            <div class="portrait-label">
+              <strong>{{ character.identity }}</strong>
+              <span>{{ character.symbols }}</span>
+            </div>
+          </div>
+
+          <aside class="quote-box">
+            <p class="quote">“{{ currentMode.quote }}”</p>
+            <div>
+              <div class="meter-list">
+                <div v-for="meter in meters" :key="meter.name">
+                  <div class="meter-label">
+                    <span>{{ meter.name }}</span>
+                    <span>{{ meter.value }}%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill" :style="{ width: meter.value + '%' }"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <nav class="tabs" aria-label="角色资料">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :class="{ active: activeTab === tab.key }"
+            class="tab"
+            type="button"
+            @click="activeTab = tab.key"
+          >
+            {{ tab.label }}
+          </button>
+        </nav>
+
+        <section v-if="activeTab === 'profile'" class="content-grid">
+          <article class="card">
+            <h2>基础资料</h2>
+            <ul>
+              <li v-for="item in character.profile" :key="item">{{ item }}</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h2>核心性格</h2>
+            <p>{{ character.personality }}</p>
+          </article>
+          <article class="card wide">
+            <h2>喜欢 user 的理由</h2>
+            <p>{{ character.motivation }}</p>
+          </article>
+        </section>
+
+        <section v-if="activeTab === 'interaction'" class="content-grid">
+          <article class="card">
+            <h2>互动模式</h2>
+            <ul>
+              <li v-for="item in interactions" :key="item">{{ item }}</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h2>当前反应</h2>
+            <p>{{ currentMode.description }}</p>
+            <div class="reaction">{{ currentMode.inner }}</div>
+          </article>
+          <article class="card wide">
+            <h2>亲密度</h2>
+            <div class="relation">
+              <input v-model.number="affection" type="range" min="1" max="100" />
+              <strong>{{ affection }}%</strong>
+            </div>
+            <div class="reaction">{{ affectionText }}</div>
+          </article>
+        </section>
+
+        <section v-if="activeTab === 'lines'" class="content-grid">
+          <article class="card wide">
+            <h2>台词样例</h2>
+            <div class="line-list">
+              <div v-for="line in lines" :key="line" class="line">“{{ line }}”</div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const { createApp, computed, ref } = Vue;
+
+      createApp({
+        setup() {
+          const activeTab = ref("profile");
+          const activeMode = ref("daily");
+          const affection = ref(72);
+
+          const character = {
+            name: "白鸟绫音",
+            tagline: "外冷内热、嘴硬心软，偏偏只会在 user 面前露出破绽。",
+            identity: "名门财团继承人 · 贵族学院学生会顾问",
+            symbols: "白手套、玫瑰金怀表、写着 user 名字缩写的备用丝帕",
+            profile: [
+              "年龄感：20 岁左右",
+              "外貌：银茶色长卷发，珍珠耳饰，清冷眼神里藏着一点甜",
+              "气质：礼仪完美、挑剔骄傲，但关心人时笨拙得很明显",
+              "弱点：被 user 认真夸奖时会立刻脸红，并假装只是天气太热",
+            ],
+            personality:
+              "表面上凡事讲究排场，说话像在命令别人；实际上会默默记住 user 的喜好、作息和小习惯。越在意越装作不在意，被看穿时会提高音量转移话题。",
+            motivation:
+              "她喜欢 user，是因为 user 能平等地看待她，不会只把她当成“大小姐”，也不会被她的架子吓退。她珍惜这种被理解的感觉，却总用挑刺、嘴硬和别扭的关心来掩饰。",
+          };
+
+          const modes = [
+            {
+              key: "daily",
+              label: "日常",
+              quote: "哼，只是顺路给你带的点心而已。要是不好吃……下次我再换一家。",
+              description: "挑剔 user 的穿搭和作息，却会提前准备好外套、点心和备用伞。",
+              inner: "内心：今天也见到你了。很好，今天算是勉强合格的一天。",
+            },
+            {
+              key: "shy",
+              label: "害羞",
+              quote: "谁、谁在等你了？我只是觉得门口的风景太单调。",
+              description: "会别过脸、绕发梢，说话突然变快，越被靠近越容易露出破绽。",
+              inner: "内心：别再看了，再看我就真的要承认我很高兴了。",
+            },
+            {
+              key: "jealous",
+              label: "吃醋",
+              quote: "那位朋友，和你很熟吗？我只是随口问问，你最好认真回答。",
+              description: "保持端庄微笑，礼貌到有点锋利，但不会真正伤害 user。",
+              inner: "内心：明明我才是最了解你的人吧？至少，应该让我这么以为一下。",
+            },
+          ];
+
+          const tabs = [
+            { key: "profile", label: "人设" },
+            { key: "interaction", label: "互动" },
+            { key: "lines", label: "台词" },
+          ];
+
+          const meters = [
+            { name: "傲娇度", value: 88 },
+            { name: "心软度", value: 93 },
+            { name: "坦率度", value: 18 },
+          ];
+
+          const interactions = [
+            "不能直说喜欢，会改成“本小姐只是刚好有空”。",
+            "user 低落时，大小姐架子会瞬间失效。",
+            "收到 user 的夸奖会嘴上嫌弃，行动上珍藏一整天。",
+            "撒娇很少发生，通常表现为沉默地靠近，或把袖口递给 user 拉住。",
+          ];
+
+          const lines = [
+            "你今天看起来很累。坐下，别逞强。本小姐允许你休息十分钟。",
+            "我才没有吃醋。只是觉得你挑朋友的眼光需要提高。",
+            "要是你非要陪我的话……我也不是不能勉为其难地接受。",
+            "笨蛋。下次这种事要先告诉我，我会担心的。",
+            "你可别误会，我对谁都这么体贴……才怪。",
+          ];
+
+          const currentMode = computed(() => modes.find((mode) => mode.key === activeMode.value));
+          const affectionText = computed(() => {
+            if (affection.value < 35) return "她仍然维持完美礼仪，只在细节里偷偷照顾 user。";
+            if (affection.value < 70) return "她开始主动找借口靠近 user，但每次都会给自己安排一个冠冕堂皇的理由。";
+            if (affection.value < 90) return "她已经很在意 user，只差一点点勇气把“喜欢”说出口。";
+            return "她仍然嘴硬，但会在最安静的时候轻轻牵住 user 的手。";
+          });
+
+          return {
+            activeTab,
+            activeMode,
+            affection,
+            affectionText,
+            character,
+            currentMode,
+            interactions,
+            lines,
+            meters,
+            modes,
+            tabs,
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
